@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Belgisch Juridisch Procedureanalyse Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @media print {
+            aside, header, .no-print { display: none !important; }
+            body { background: white !important; color: black !important; }
+            #tab-report { display: block !important; }
+            #tab-1, #tab-2, #tab-3, #tab-4, #tab-5, #tab-6 { display: none !important; }
+            #report-output { color: black !important; background: white !important; border: none !important; }
+            main { overflow: visible !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans antialiased">
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar Navigation -->
+        <aside class="w-80 bg-slate-950 border-r border-slate-800 flex flex-col justify-between">
+            <div>
+                <div class="p-6 border-b border-slate-800 flex items-center gap-3">
+                    <i class="fa-solid fa-scale-balanced text-amber-500 text-2xl"></i>
+                    <div>
+                        <h1 class="font-bold text-lg text-slate-100 leading-tight">LexBelgica AI</h1>
+                        <p class="text-xs text-slate-400">Procedureanalyse Framework</p>
+                    </div>
+                </div>
+                <nav class="p-4 space-y-1">
+                    <button onclick="switchTab('tab-1')" id="nav-tab-1" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition text-amber-400 bg-slate-800/60 border-l-4 border-amber-500">
+                        <i class="fa-solid fa-file-contract w-5"></i> 1. Casus & Kwalificatie
+                    </button>
+                    <button onclick="switchTab('tab-2')" id="nav-tab-2" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 transition">
+                        <i class="fa-solid fa-gavel w-5"></i> 2. Procedure & Jurisdictie
+                    </button>
+                    <button onclick="switchTab('tab-3')" id="nav-tab-3" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 transition">
+                        <i class="fa-solid fa-timeline w-5"></i> 3. Chronologie & Workflow
+                    </button>
+                    <button onclick="switchTab('tab-4')" id="nav-tab-4" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 transition">
+                        <i class="fa-solid fa-triangle-exclamation w-5"></i> 4. Termijnen & Nietigheden
+                    </button>
+                    <button onclick="switchTab('tab-5')" id="nav-tab-5" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 transition">
+                        <i class="fa-solid fa-magnifying-glass-chart w-5"></i> 5. Bewijslast & Antigoon
+                    </button>
+                    <button onclick="switchTab('tab-6')" id="nav-tab-6" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 transition">
+                        <i class="fa-solid fa-shield-halved w-5"></i> 6. Rechtsmiddelen & Uitvoering
+                    </button>
+                    <button onclick="switchTab('tab-report')" id="nav-tab-report" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold text-emerald-400 hover:bg-emerald-950/30 transition mt-4">
+                        <i class="fa-solid fa-file-export w-5"></i> Gegenereerd Rapport
+                    </button>
+                </nav>
+            </div>
+            <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">
+                Conform Ger.W., Sv., nieuw BW & EVRM
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col overflow-y-auto bg-slate-900">
+            <!-- Header -->
+            <header class="bg-slate-950/50 backdrop-blur border-b border-slate-800 px-8 py-4 flex justify-between items-center sticky top-0 z-10">
+                <div class="flex items-center gap-4">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-amber-500 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">Belgisch Recht</span>
+                    <h2 id="section-title" class="text-lg font-bold text-slate-100">1. Casusdefinitie & Kwalificatie van het Geschil</h2>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="clearForm()" class="px-3 py-1.5 text-xs font-medium text-slate-400 hover:text-slate-200 bg-slate-800 hover:bg-slate-700 rounded-md transition">Reset</button>
+                    <button onclick="switchTab('tab-report')" class="px-3 py-1.5 text-xs font-medium text-slate-900 bg-amber-500 hover:bg-amber-400 rounded-md font-semibold transition">Genereer Analyse</button>
+                </div>
+            </header>
+
+            <div class="p-8 max-w-5xl w-full mx-auto space-y-6">
+
+                <!-- TAB 1: Casusdefinitie -->
+                <div id="tab-1" class="tab-content space-y-6">
+                    <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-6 space-y-4">
+                        <h3 class="text-md font-semibold text-amber-400 flex items-center gap-2">
+                            <i class="fa-solid fa-clipboard-list"></i> Materiële Feitenconstatering
+                        </h3>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Vaststaande Feiten (onbetwist op basis van dossierstukken)</label>
+                            <textarea id="vaststaande_feiten" rows="3" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-sm text-slate-200 focus:outline-none focus:border-amber-500" placeholder="Beschrijf de feiten die formeel en onbetwist vaststaan..."></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Betwiste / Onvoldoende Onderbouwde Feiten</label>
+                            <textarea id="betwiste_feiten" rows="3" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-sm text-slate-200 focus:outline-none focus:border-amber-500" placeholder="Beschrijf feiten die door de tegenpartij betwist worden..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-6 space-y-4">
+                        <h3 class="text-md font-semibold text-amber-400 flex items-center gap-2">
+                            <i class="fa-solid fa-scale-unbalanced"></i> Juridische Herkwalificatie
+                        </h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-300 mb-1">Kwalificatie van de Feiten</label>
+                                <select id="juridische_kwalificatie" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                                    <option value="Contractuele wanprestatie">Contractuele wanprestatie</option>
+                                    <option value="Buitencontractuele aansprakelijkheid (art. 1382/6.1 BW)">Buitencontractuele aansprakelijkheid (art. 1382/6.1 BW)</option>
+                                    <option value="Strafrechtelijk misdrijf (Overtreding/Wanbedrijf/Misdaad)">Strafrechtelijk misdrijf (Overtreding/Wanbedrijf/Misdaad)</option>
+                                    <option value="Administratieve / Bestuurlijke onregelmatigheid">Administratieve / Bestuurlijke onregelmatigheid</option>
+                                    <option value="Sociaal / Arbeidsrechtelijk geschil">Sociaal / Arbeidsrechtelijk geschil</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-300 mb-1">Primair Rechtsgebied</label>
+                                <select id="primair_rechtsgebied" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                                    <option value="Burgerlijk Recht">Burgerlijk Recht</option>
+                                    <option value="Ondernemingsrecht">Ondernemingsrecht</option>
+                                    <option value="Strafrecht & Verkeersrecht">Strafrecht & Verkeersrecht</option>
+                                    <option value="Sociaal Recht">Sociaal Recht</option>
+                                    <option value="Bestuursrecht / Administratief Recht">Bestuursrecht / Administratief Recht</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: Procedure & Jurisdictie -->
+                <div id="tab-2" class="tab-content hidden space-y-6">
+                    <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-6 space-y-4">
+                        <h3 class="text-md font-semibold text-amber-400 flex items-center gap-2">
+                            <i class="fa-solid fa-route"></i> Toepasselijke Procedureroute
+                        </h3>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Type Procedure</label>
+                            <select id="procedure_route" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                                <option value="Bodemprocedure via dagvaarding">Bodemprocedure via dagvaarding</option>
+                                <option value="Procedure op verzoekschrift op tegenspraak (art. 1034ter Ger.W.)">Procedure op verzoekschrift op tegenspraak (art. 1034ter Ger.W.)</option>
+                                <option value="Kort geding bij hoogdringendheid (art. 584 Ger.W.)">Kort geding bij hoogdringendheid (art. 584 Ger.W.)</option>
+                                <option value="Eenzijdig verzoekschrift (art. 588 Ger.W.)">Eenzijdig verzoekschrift (art. 588 Ger.W.)</option>
+                                <option value="Strafrechtelijke rechtstreekse dagvaarding">Strafrechtelijke rechtstreekse dagvaarding</option>
+                                <option value="Schorsings- / Vernietigingsberoep Raad van State">Schorsings- / Vernietigingsberoep Raad van State</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-6 space-y-4">
+                        <h3 class="text-md font-semibold text-amber-400 flex items-center gap-2">
+                            <i class="fa-solid fa-building-columns"></i> Rechterlijke Bevoegdheid
+                        </h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-300 mb-1">Materiële Bevoegdheid (ratione materiae)</label>
+                                <select id="materiele_bevoegdheid" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                                    <option value="Vredegerecht">Vredegerecht</option>
+                                    <option value="Politierechtbank">Politierechtbank</option>
+                                    <option value="Rechtbank van Eerste Aanleg (Burgerlijk)">Rechtbank van Eerste Aanleg (Burgerlijk)</option>
+                                    <option value="Correctionele Rechtbank">Correctionele Rechtbank</option>
+                                    <option value="Ondernemingsrechtbank">Ondernemingsrechtbank</option>
+                                    <option value="Arbeidsrechtbank">Arbeidsrechtbank</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-300 mb-1">Territoriale Bevoegdheid (art. 622–630 Ger.W.)</label>
+                                <input type="text" id="territoriale_bevoegdheid" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500" placeholder="bijv. Gerechtelijk Arrondissement Gent, Kanton Lochristi">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-6 space-y-4">
+                        <h3 class="text-md font-semibold text-amber-400 flex items-center gap-2">
+                            <i class="fa-solid fa-language"></i> Dwingende Taalwetgeving (Wet 15 juni 1935)
+                        </h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-300 mb-1">Procestaal van het Rechtsgebied</label>
+                                <select id="procestaal" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                                    <option value="Nederlands">Nederlands</option>
+                                    <option value="Frans">Frans</option>
+                                    <option value="Duits">Duits</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center gap-3 pt-6">
+                                <input type="checkbox" id="taalverzet_nodig" class="w-4 h-4 text-amber-500 bg-slate-950 border-slate-700 rounded">
+                                <label for="taalverzet_nodig" class="text-sm text-slate-300">Taalverzet of Taalwijziging vereist</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: Chronologie -->
+                <div id="tab-3" class="tab-content hidden space-y-6">
+                    <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-6 space-y-4">
+                        <h3 class="text-md font-semibold text-amber-400 flex items-center gap-2">
+                            <i class="fa-solid fa-clock"></i> Chronologische Rechtspleging
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-300 mb-1">Datum Ingebrekestelling</label>
+                                    <input type="date" id="datum_ingebrekestelling" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-300 mb-1">Resultaat Verplichte Bemiddeling</label>
+                                    <input type="text" id="pre_contentieus" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500" placeholder="bijv. Mislukt, geen akkoord bereikt...">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-300 mb-1">Datum Aanhangigmaking (Dagvaarding / Verzoekschrift)</label>
+                                    <input type="date" id="datum_aanhangigmaking" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-300 mb-1">Wijze van Aanhangigmaking</label>
+                                    <input type="text" id="aanhangigmaking" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500" placeholder="bijv. Betekening bij gerechtsdeurwaarder / neerlegging griffie...">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-300 mb-1">Conclusiekalender (art. 747 Ger.W.)</label>
+                                <textarea id="conclusiekalender" rows="2" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-sm text-slate-200 focus:outline-none focus:border-amber-500" placeholder="Uiterste data conclusies eiser/verweerder en syntheseconclusies..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 4: Nietigheden -->
+                <div id="tab-4" class="tab-content hidden space-y-6">
+                    <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-6 space-y-4">
+                        <h3 class="text-md font-semibold text-amber-400 flex items-center gap-2">
+                            <i class="fa-solid fa-bug"></i> Controle op Termijnen & Nietigheden
+                        </h3>
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-300 mb-1">Verjaringstermijn (BW / Sv.)</label>
+                                    <input type="text" id="verjaringstermijn" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500" placeholder="bijv. 5 jaar (art. 2262bis §1 BW)">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-slate-300 mb-1">Vervaltermijn (*délais de forclusion*)</label>
+                                    <input type="text" id="vervaltermijn" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500" placeholder="bijv. 1 maand na betekening verstek">
+                                </div>
+                            </div>
+                            
+                            <div class="border-t border-slate-700 pt-4 space-y-2">
+                                <label class="block text-xs font-medium text-slate-300 mb-1">Procedurele Nietigheden & Schendingen</label>
+                                <div class="space-y-2">
+                                    <label class="flex items-center gap-2 text-sm text-slate-300">
+                                        <input type="checkbox" id="art861_grief" class="rounded bg-slate-950 border-slate-700 text-amber-500">
+                                        Art. 861 Ger.W. Toetsing: Aantoonbare belangenschade (*grief*) aanwezig
+                                    </label>
+                                    <label class="flex items-center gap-2 text-sm text-slate-300">
+                                        <input type="checkbox" id="salduz_schending" class="rounded bg-slate-950 border-slate-700 text-amber-500">
+                                        Salduz-norm schending (Afwezigheid raadsman bij verhoor)
+                                    </label>
+                                    <label class="flex items-center gap-2 text-sm text-slate-300">
+                                        <input type="checkbox" id="art6_evrm" class="rounded bg-slate-950 border-slate-700 text-amber-500">
+                                        Schending Art. 6 EVRM (Eerlijk proces / Redelijke termijn)
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 5: Bewijs -->
+                <div id="tab-5" class="tab-content hidden space-y-6">
+                    <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-6 space-y-4">
+                        <h3 class="text-md font-semibold text-amber-400 flex items-center gap-2">
+                            <i class="fa-solid fa-scale-balanced"></i> Bewijslast & Antigoon-Toetsing
+                        </h3>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Bewijslastverdeling (Art. 8.4 nieuw BW)</label>
+                            <input type="text" id="bewijslast_partij" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500" placeholder="Welke partij draagt het menselijk/materieel bewijsrisico?">
+                        </div>
+                        <div class="border-t border-slate-700 pt-4 space-y-2">
+                            <h4 class="text-xs font-semibold text-slate-200 uppercase tracking-wider">Antigoon-Toetsing Onrechtmatig Bewijs</h4>
+                            <div class="space-y-2">
+                                <label class="flex items-center gap-2 text-sm text-slate-300">
+                                    <input type="checkbox" id="antigoon_1" class="rounded bg-slate-950 border-slate-700 text-amber-500">
+                                    Vormfout voorgeschreven op straffe van nietigheid
+                                </label>
+                                <label class="flex items-center gap-2 text-sm text-slate-300">
+                                    <input type="checkbox" id="antigoon_2" class="rounded bg-slate-950 border-slate-700 text-amber-500">
+                                    Betrouwbaarheid van het bewijs is aangetast
+                                </label>
+                                <label class="flex items-center gap-2 text-sm text-slate-300">
+                                    <input type="checkbox" id="antigoon_3" class="rounded bg-slate-950 border-slate-700 text-amber-500">
+                                    Gebruik van bewijs schendt recht op eerlijk proces (Art. 6 EVRM)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 6: Rechtsmiddelen -->
+                <div id="tab-6" class="tab-content hidden space-y-6">
+                    <div class="bg-slate-800/40 border border-slate-700/60 rounded-xl p-6 space-y-4">
+                        <h3 class="text-md font-semibold text-amber-400 flex items-center gap-2">
+                            <i class="fa-solid fa-gavel"></i> Uitspraak, Rechtsmiddelen & Kosten
+                        </h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-300 mb-1">Beschikbare Rechtsmiddelen</label>
+                                <select id="rechtsmiddel" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                                    <option value="Hoger Beroep (art. 1051 Ger.W. - 1 maand)">Hoger Beroep (art. 1051 Ger.W. - 1 maand)</option>
+                                    <option value="Verzet bij verstek (art. 1048 Ger.W. - 1 maand)">Verzet bij verstek (art. 1048 Ger.W. - 1 maand)</option>
+                                    <option value="Voorziening in Cassatie (3 maanden)">Voorziening in Cassatie (3 maanden)</option>
+                                    <option value="Geen - Definitief vonnis">Geen - Definitief vonnis</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-300 mb-1">Rechtsplegingsvergoeding (RPV) — Basisbedrag Schijf</label>
+                                <select id="rpv_schijf" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500">
+                                    <option value="Tot € 250 — Basis € 180">Tot € 250 — Basis € 180</option>
+                                    <option value="€ 250,01 – € 750 — Basis € 240">€ 250,01 – € 750 — Basis € 240</option>
+                                    <option value="€ 750,01 – € 2.500 — Basis € 480">€ 750,01 – € 2.500 — Basis € 480</option>
+                                    <option value="€ 2.500,01 – € 5.000 — Basis € 785">€ 2.500,01 – € 5.000 — Basis € 785</option>
+                                    <option value="€ 5.000,01 – € 10.000 — Basis € 1.080">€ 5.000,01 – € 10.000 — Basis € 1.080</option>
+                                    <option value="€ 10.000,01 – € 20.000 — Basis € 1.320">€ 10.000,01 – € 20.000 — Basis € 1.320</option>
+                                    <option value="Niet in geld waardeerbare vordering — Basis € 1.320">Niet in geld waardeerbare vordering — Basis € 1.320</option>
+                                    <option value="Aangepast tarief op maat">Aangepast tarief op maat</option>
+                                </select>
+                                <input type="text" id="rpv_bedrag" class="w-full mt-2 bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-sm text-slate-200 focus:outline-none focus:border-amber-500" placeholder="Optioneel: exact bedrag of opmerking (bv. verhoging complexiteit)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB Report -->
+                <div id="tab-report" class="tab-content hidden space-y-6">
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-6 space-y-4">
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-4">
+                            <h3 class="text-lg font-bold text-amber-400 flex items-center gap-2">
+                                <i class="fa-solid fa-file-invoice"></i> Gegenereerd Synthese-Rapport
+                            </h3>
+                            <div class="flex gap-2 no-print">
+                                <button onclick="window.print()" class="px-3 py-1.5 text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-md transition flex items-center gap-2">
+                                    <i class="fa-solid fa-print"></i> Print / PDF
+                                </button>
+                                <button onclick="copyReport()" class="px-3 py-1.5 text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-md transition flex items-center gap-2">
+                                    <i class="fa-regular fa-copy"></i> Kopieer Rapport
+                                </button>
+                            </div>
+                        </div>
+                        <pre id="report-output" class="whitespace-pre-wrap font-mono text-xs text-slate-300 leading-relaxed bg-slate-900 p-4 rounded-lg border border-slate-800 overflow-x-auto"></pre>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-amber-400', 'bg-slate-800/60', 'border-l-4', 'border-amber-500');
+                btn.classList.add('text-slate-400');
+            });
+
+            document.getElementById(tabId).classList.remove('hidden');
+            const activeBtn = document.getElementById('nav-' + tabId);
+            if (activeBtn) {
+                activeBtn.classList.add('text-amber-400', 'bg-slate-800/60', 'border-l-4', 'border-amber-500');
+                activeBtn.classList.remove('text-slate-400');
+            }
+
+            const titles = {
+                'tab-1': '1. Casusdefinitie & Kwalificatie van het Geschil',
+                'tab-2': '2. Identificatie van de Procedure & Jurisdictie',
+                'tab-3': '3. Chronologische Workflow van de Procedure',
+                'tab-4': '4. Controle op Termijnen, Nietigheden & Vormfouten',
+                'tab-5': '5. Bewijskracht & Antigoon-Toetsing',
+                'tab-6': '6. Uitspraak, Rechtsmiddelen & Tenuitvoerlegging',
+                'tab-report': 'Gegenereerd Juridisch Synthese-Rapport'
+            };
+            document.getElementById('section-title').innerText = titles[tabId];
+
+            if(tabId === 'tab-report') {
+                generateReport();
+            }
+        }
+
+        function formatDate(isoDate) {
+            if (!isoDate) return null;
+            const [y, m, d] = isoDate.split('-');
+            return `${d}/${m}/${y}`;
+        }
+
+        function generateReport() {
+            const vaststaande = document.getElementById('vaststaande_feiten').value || 'Niet opgegeven';
+            const betwiste = document.getElementById('betwiste_feiten').value || 'Niet opgegeven';
+            const kwalificatie = document.getElementById('juridische_kwalificatie').value;
+            const rechtsgebied = document.getElementById('primair_rechtsgebied').value;
+            const route = document.getElementById('procedure_route').value;
+            const materieel = document.getElementById('materiele_bevoegdheid').value;
+            const territoriaal = document.getElementById('territoriale_bevoegdheid').value || 'Onbepaald';
+            const procestaal = document.getElementById('procestaal').value;
+            const taalverzet = document.getElementById('taalverzet_nodig').checked ? 'JA' : 'NEE';
+
+            const datumIngebrekestelling = formatDate(document.getElementById('datum_ingebrekestelling').value) || 'Niet opgegeven';
+            const bemiddeling = document.getElementById('pre_contentieus').value || 'Niet van toepassing';
+            const datumAanhangigmaking = formatDate(document.getElementById('datum_aanhangigmaking').value) || 'Niet opgegeven';
+            const wijzeAanhangigmaking = document.getElementById('aanhangigmaking').value || 'Niet gespecificeerd';
+            const conclusiekalender = document.getElementById('conclusiekalender').value || 'Niet opgegeven';
+
+            const verjaring = document.getElementById('verjaringstermijn').value || 'Niet gespecificeerd';
+            const verval = document.getElementById('vervaltermijn').value || 'Niet gespecificeerd';
+            const art861 = document.getElementById('art861_grief').checked ? 'JA (Grief aanwezig)' : 'NEE';
+            const salduz = document.getElementById('salduz_schending').checked ? 'JA (Schending vastgesteld)' : 'GEEN';
+            const evrm = document.getElementById('art6_evrm').checked ? 'JA (Inbreuk gemeld)' : 'GEEN';
+
+            const antigoon = [
+                document.getElementById('antigoon_1').checked ? '- Vormfout op straffe van nietigheid' : '',
+                document.getElementById('antigoon_2').checked ? '- Betrouwbaarheid aangetast' : '',
+                document.getElementById('antigoon_3').checked ? '- Schending art. 6 EVRM' : ''
+            ].filter(Boolean).join('\n') || 'Geen Antigoon-uitsluitingsgronden geselecteerd';
+
+            const rechtsmiddel = document.getElementById('rechtsmiddel').value;
+            const rpvSchijf = document.getElementById('rpv_schijf').value;
+            const rpvOpmerking = document.getElementById('rpv_bedrag').value;
+            const rpvVolledig = rpvOpmerking ? `${rpvSchijf} | Opmerking: ${rpvOpmerking}` : rpvSchijf;
+
+            const report = `================================================================================
+BELGISCH JURIDISCH PROCEDUREANALYSE SYNTHESE-RAPPORT
+Gegenereerd via LexBelgica Framework
+================================================================================
+
+1. CASUSDEFINITIE & KWALIFICATIE
+--------------------------------------------------------------------------------
+- Vaststaande Feiten: ${vaststaande}
+- Betwiste Feiten: ${betwiste}
+- Juridische Herkwalificatie: ${kwalificatie}
+- Primair Rechtsgebied: ${rechtsgebied}
+
+2. PROCEDURE & JURISDICTIE
+--------------------------------------------------------------------------------
+- Procedureroute: ${route}
+- Bevoegde Rechtbank (Materiëel): ${materieel}
+- Territoriale Bevoegdheid (art. 622-630 Ger.W.): ${territoriaal}
+- Procestaal (Wet 15 juni 1935): ${procestaal} (Taalverzet vereist: ${taalverzet})
+
+3. CHRONOLOGIE VAN DE RECHTSPLEGING
+--------------------------------------------------------------------------------
+- Datum Ingebrekestelling: ${datumIngebrekestelling}
+- Resultaat Verplichte Bemiddeling: ${bemiddeling}
+- Datum Aanhangigmaking: ${datumAanhangigmaking}
+- Wijze van Aanhangigmaking: ${wijzeAanhangigmaking}
+- Conclusiekalender (art. 747 Ger.W.): ${conclusiekalender}
+
+4. TERMIJNEN, NIETIGHEDEN & VORMFOUTEN
+--------------------------------------------------------------------------------
+- Verjaringstermijn: ${verjaring}
+- Vervaltermijn: ${verval}
+- Art. 861 Ger.W. (Belangenschade/Grief): ${art861}
+- Salduz-norm Schending: ${salduz}
+- Art. 6 EVRM Schending: ${evrm}
+
+5. BEWIJSKRACHT & ANTIGOON-TOETSING
+--------------------------------------------------------------------------------
+- Bewijslast (art. 8.4 BW): ${document.getElementById('bewijslast_partij').value || 'Conform algemene regel (actori incumbit probatio)'}
+- Antigoon-Uitsluitingsgronden:
+${antigoon}
+
+6. RECHTSMIDDELEN & TENUITVOERLEGGING
+--------------------------------------------------------------------------------
+- Beschikbaar Rechtsmiddel: ${rechtsmiddel}
+- RPV / Kostenbegroting: ${rpvVolledig}
+
+================================================================================
+Rapport gegenereerd op: ${new Date().toLocaleDateString('nl-BE')}
+================================================================================`;
+
+            document.getElementById('report-output').innerText = report;
+        }
+
+        function copyReport() {
+            const reportText = document.getElementById('report-output').innerText;
+            navigator.clipboard.writeText(reportText);
+            alert('Rapport gekopieerd naar klembord.');
+        }
+
+        function clearForm() {
+            document.querySelectorAll('input, textarea').forEach(el => {
+                if (el.type === 'checkbox') el.checked = false;
+                else el.value = '';
+            });
+            document.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
+            switchTab('tab-1');
+        }
+    </script>
+</body>
+</html>
